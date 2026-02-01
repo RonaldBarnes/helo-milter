@@ -1,0 +1,25 @@
+
+[Unit]
+Description=Postfix Helo Validity Milter
+Conflicts=sendmail.service exim4.service
+ConditionPathExists=/etc/postfix/main.cf
+Requires=postfix.service
+
+
+[Service]
+Type=simple
+
+WorkingDirectory=/path/to/your/folder
+ExecStart=/path/to/your/folder/start-helo-milter.sh
+
+ExecReload=kill -SIGHUP $MAINPID
+
+## Restarts when this signal is sent to process
+## Regardless of Restart=... directive!
+RestartForceExitStatus=1 SIGHUP
+
+## These will be considered successful, not failed, runs:
+SuccessExitStatus=1 SIGHUP 2 SIGINT 30 SIGPWR
+
+[Install]
+WantedBy=multi-user.target
