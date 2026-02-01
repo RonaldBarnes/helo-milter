@@ -44,7 +44,7 @@ ACTIONS = {
 	"match_false": {
 		"add_header": True,
 		"quarantine": False,
-		"reject": True,
+		"reject": False,
 		},
 	}
 
