@@ -9,8 +9,11 @@ Requires=postfix.service
 [Service]
 Type=simple
 
-WorkingDirectory=/path/to/your/folder
-ExecStart=/path/to/your/folder/start-helo-milter.sh
+## If running in a venv (Virtual ENVironment), set the path to venv/bin here:
+## Environment=VIRTUAL_ENV=/path/to/your/folder/venv
+Environment=PATH=/path/to/your/folder/venv/bin
+
+ExecStart=python3 /path/to/your/folder/helo-milter.py
 
 ExecReload=kill -SIGHUP $MAINPID
 
