@@ -1,6 +1,6 @@
 
 """
-	Test if identity given by `helo` command matches DNS lookup on connecting IP
+  Test if identity given by `helo` command matches DNS lookup on connecting IP
 """
 
 import logging
@@ -61,7 +61,7 @@ SOCKET_FILE = "/var/spool/postfix/milter.sock"
 ## Actions to take while analyzing helo:
 ACTIONS = {
 	"match_true": {
-		"add_header": True,
+		"add_header": False,
 		},
 	"match_false": {
 		"add_header": True,
