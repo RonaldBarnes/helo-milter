@@ -46,6 +46,13 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
   )
 ```
+5. Edit `/etc/postfix/main.cf` and enable the milter:
+  ```
+  milter_protocol = 6
+  ## NOTE: unix:milter.sock is actually /var/spool/postfix/milter.sock since
+  ## postfix is chroot'd by default:
+  smtpd_milters = unix:/milter.sock
+  ```
 
 
 ## Logging Notes
