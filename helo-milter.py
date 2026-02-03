@@ -3,13 +3,46 @@
 	Test if identity given by `helo` command matches DNS lookup on connecting IP
 """
 
-## from Milter import Milter
-import Milter
+import logging
+logging.basicConfig(
+  ## level=logging.DEBUG,
+  level=logging.INFO,
+  ## level=logging.WARNING,
+  ## level=logging.ERROR,
+  ## level=logging.CRITICAL,
+  format='%(asctime)s [%(levelname)s] %(message)s',
+    datefmt="%Y-%m-%d %H:%M:%S"
+  )
 
-## Need to chown and chmod the socket:
+## Need to chown and chmod the socket, plus check for ./venv:
 import os, stat
 from pwd import getpwnam
 
+## import Milter, and if first attempt fails, check for ./venv and try that:
+try:
+  import Milter
+except ModuleNotFoundError as e:
+  logging.info("Module Milter not found, checking for ./venv")
+  if os.path.exists("./venv/lib/") and os.path.isdir("./venv/lib/"):
+    try:
+      dirs = os.listdir("./venv/lib/")
+      if len(dirs) != 1:
+        raise Error("Cannot file Milter and cannot find venv in ./venv/lib/")
+    except Exception as e:
+      logging.critical( f"os.listdir() failed: found ./venv/lib/ but...empty?")
+      logging.critical( f"ERROR is {e}")
+      os._exit(99)
+
+    try:
+      import sys
+      sys.path.append( f"./venv/lib/{dirs[0]}/site-packages/")
+      logging.debug( f"Checking ./venv/lib/{dirs[0]}/site-packages/ for Milter")
+      import Milter
+      logging.warning( f"Milter found in ./venv/lib/{dirs[0]}/site-packages/")
+    except Exception as e:
+      logging.critical( f"Milter module not found (try `pip install pymilter`)")
+      logging.critical(e)
+      os._exit(99)
 
 ## Threading helps responsiveness and allows signal catching:
 import threading
@@ -19,17 +52,6 @@ import signal
 
 from time import sleep
 
-
-import logging
-logging.basicConfig(
-	level=logging.DEBUG,
-	## level=logging.INFO,
-	## level=logging.WARNING,
-	## level=logging.ERROR,
-	## level=logging.CRITICAL,
-	format='%(asctime)s [%(levelname)s] %(message)s',
-		datefmt="%Y-%m-%d %H:%M:%S"
-	)
 
 
 

@@ -9,20 +9,19 @@ Requires=postfix.service
 [Service]
 Type=simple
 
-## If running in a venv (Virtual ENVironment), set the path to venv/bin here:
-## Environment=VIRTUAL_ENV=/path/to/your/folder/venv
-Environment=PATH=/path/to/your/folder/venv/bin
-
-ExecStart=python3 /path/to/your/folder/helo-milter.py
+#WorkingDirectory=/path/to/your/helo-milter/
+#ExecStart=python3 /path/to/your/helo-milter/helo-milter.py
 
 ExecReload=kill -SIGHUP $MAINPID
 
+## Default restart policy:
+Restart=no
 ## Restarts when this signal is sent to process
 ## Regardless of Restart=... directive!
 RestartForceExitStatus=1 SIGHUP
 
 ## These will be considered successful, not failed, runs:
-SuccessExitStatus=1 SIGHUP 2 SIGINT 30 SIGPWR
+SuccessExitStatus=1 SIGHUP 2 SIGINT 15 SIGTERM
 
 [Install]
 WantedBy=multi-user.target
