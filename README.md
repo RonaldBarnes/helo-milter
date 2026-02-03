@@ -17,15 +17,15 @@ Checks for `helo` statement matching connecting IP's DNS lookup hostname
 1. `apt install libmilter-dev`
 2. `pip install pymilter`
 3. Edit `helo-milter.service`:
-   * Change `Environment=Path=` to point to your venv/bin (if using venv), else remove it
+   * Change `WorkingDirectory=` to point to your cloned repo folder
    * Change `ExecStart=` to point to location of your `helo-milter.py`
 4. Edit `helo-milter.py`:
-   * Modify `ACTIONS` dict to select preferred actions (default is add headers):
+   * Modify `ACTIONS` dict to select preferred actions (default is add headers on mis-match):
   '## Actions to take while analyzing helo:
   ```
   ACTIONS = {
     "match_true": {
-      "add_header": True,
+      "add_header": False,
       },
     "match_false": {
       "add_header": True,
@@ -34,11 +34,11 @@ Checks for `helo` statement matching connecting IP's DNS lookup hostname
       },
     }
 ```
-  * Modify `logging.basicConfig` to select preferred log level (default is DEBUG):
+  * Modify `logging.basicConfig` to select preferred log level (default is INFO):
 ```
 logging.basicConfig(
-  level=logging.DEBUG,
-  ## level=logging.INFO,
+  ## level=logging.DEBUG,
+  level=logging.INFO,
   ## level=logging.WARNING,
   ## level=logging.ERROR,
   ## level=logging.CRITICAL,
@@ -57,7 +57,7 @@ logging.basicConfig(
 
 ## Logging Notes
 
-Logging default level is DEBUG.
+Logging default level is INFO.
 
 Logging outputs the date & time. Note that viewing output in `journalctl` will 
 show another date & time. Change the `logging.basicConfig` to remove `%(asctime)s`
@@ -74,6 +74,6 @@ This allows supporting `systemctl reload helo-milter.service` for a clean restar
 via `SIGHUP`.
 
 Successful exit codes are shown in `helo-milter.service`:
-`SuccessExitStatus=1 SIGHUP 2 SIGINT 30 SIGPWR`
+`SuccessExitStatus=1 SIGHUP 2 SIGINT 15 SIGTERM`
 
 The unit file's `RestartForceExitStatus=1` will force a restart on exit code 1 (`SIGHUP`).
