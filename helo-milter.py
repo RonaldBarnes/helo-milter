@@ -22,7 +22,7 @@ from pwd import getpwnam
 try:
   import Milter
 except ModuleNotFoundError as e:
-  logging.info("Module Milter not found, checking for ./venv")
+  logging.error("Module Milter not found, checking for ./venv")
   if os.path.exists("./venv/lib/") and os.path.isdir("./venv/lib/"):
     try:
       dirs = os.listdir("./venv/lib/")
