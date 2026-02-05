@@ -53,6 +53,20 @@ logging.basicConfig(
   ## postfix is chroot'd by default:
   smtpd_milters = unix:/milter.sock
   ```
+6. Edit `/etc/postfix/master.cf` and **disable** the milter for email clients
+submitting mail:
+  ```
+submission inet n       -       y       -       -       smtpd
+  ...
+  -o smtpd_milters=
+  ...
+
+smtps     inet  n       -       y       -       -       smtpd
+  ...
+  -o smtpd_milters=
+  ...
+
+  ```
 
 
 ## Logging Notes
