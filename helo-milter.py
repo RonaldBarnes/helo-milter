@@ -56,7 +56,7 @@ from time import sleep
 
 
 
-SOCKET_FILE = "/var/spool/postfix/milter.sock"
+SOCKET_FILE = "/var/spool/postfix/helo-milter.sock"
 
 ## Actions to take while analyzing helo:
 ACTIONS = {
