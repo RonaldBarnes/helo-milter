@@ -144,11 +144,24 @@ class HeloCheckMilter(Milter.Base):
     super().__init__()
 
   def connect(self, hostname, family, host_addr_port):
-    logging.debug(
-      f"connect() hostname:{hostname} "
-      ## f"family:{family} "
-      f"{host_addr_port[0]}:{host_addr_port[1]}"
-      )
+    ## postfix/smtpd[1337438]: lost connection after CONNECT from unknown[unknown]
+    ##     f"connect() hostname:{hostname} "
+    ## TypeError: 'NoneType' object is not subscriptable
+    ## Catch the following for host_addr_port not being the expected tuple:
+    ## except TypeError:
+    try:
+        logging.debug(
+          f"connect() hostname:{hostname} "
+          ## f"family:{family} "
+          f"{host_addr_port[0]}:{host_addr_port[1]}"
+          )
+    except Exception as e:
+        logging.warning(
+          f"connect() hostname:{hostname} "
+          ## f"family:{family} "
+          f"{host_addr_port} (UNKNOWN? Not an (IP,port) tuple? {e})"
+          )
+
     self.connect_from = hostname
     return Milter.CONTINUE
 
