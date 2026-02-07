@@ -51,7 +51,7 @@ logging.basicConfig(
   milter_protocol = 6
   ## NOTE: unix:milter.sock is actually /var/spool/postfix/milter.sock since
   ## postfix is chroot'd by default:
-  smtpd_milters = unix:/milter.sock
+  smtpd_milters = unix:/helo-milter.sock
   ```
 6. Edit `/etc/postfix/master.cf` and **disable** the milter for email clients
 submitting mail:
