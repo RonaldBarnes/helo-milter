@@ -10,18 +10,19 @@ Requires=postfix.service
 Type=simple
 
 #WorkingDirectory=/path/to/your/helo-milter/
-#ExecStart=python3 /path/to/your/helo-milter/helo-milter.py
+#ExecStart=python3 helo-milter.py
 
-ExecReload=kill -SIGHUP $MAINPID
+ExecReload=kill -SIGUSR1 $MAINPID
 
 ## Default restart policy:
 Restart=no
 ## Restarts when this signal is sent to process
 ## Regardless of Restart=... directive!
-RestartForceExitStatus=1 SIGHUP
+## (10=SIGUSR1; systemd doesn't know Linux SIG*)
+RestartForceExitStatus=10 SIGUSR1
 
-## These will be considered successful, not failed, runs:
-SuccessExitStatus=1 SIGHUP 2 SIGINT 15 SIGTERM
+## This (SIGUSR1) will be considered successful, not failed, runs:
+SuccessExitStatus=10 SIGUSR1
 
 [Install]
 WantedBy=multi-user.target

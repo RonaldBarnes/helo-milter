@@ -31,7 +31,7 @@ except ModuleNotFoundError as e:
     except Exception as e:
       logging.critical( f"os.listdir() failed: found ./venv/lib/ but...empty?")
       logging.critical( f"ERROR is {e}")
-      os._exit(99)
+      os._exit(6)	## Not Installed per `systemd-anylyze exit-status`
 
     try:
       import sys
@@ -42,7 +42,7 @@ except ModuleNotFoundError as e:
     except Exception as e:
       logging.critical( f"Milter module not found (try `pip install pymilter`)")
       logging.critical(e)
-      os._exit(99)
+      os._exit(6)	## Not Installed per `systemd-anylyze exit-status`
 
 ## Threading helps responsiveness and allows signal catching:
 import threading
@@ -92,11 +92,11 @@ def chown_socket():
 	except KeyError as e:
 		logging.critical( f"ERROR getting user postfix: {e}")
 		cleanup_socket()
-		os._exit(255)
+		os._exit(217)	## User per `systemd-anylyze exit-status`
 	except Exception as e:
 		logging.critical( f"ERROR getting user postfix: {type(e).__name__}")
 		cleanup_socket()
-		os._exit(255)
+		os._exit(217)	## User per `systemd-anylyze exit-status`
 
 	file_perms()
 
@@ -126,12 +126,12 @@ def file_perms():
 
 	except FileNotFoundError:
 		logging.critical( f"ERROR: {SOCKET_FILE} not found")
-		os._exit(255)
+		os._exit(233)	## RUNTIME_DIRECTORY  per `systemd-anylyze exit-status`
 
 	except Exception as e:
 		logging.critical( f"ERROR setting perms on {SOCKET_FILE}: {e}")
 		cleanup_socket()
-		os._exit(255)
+		os._exit(233)	## RUNTIME_DIRECTORY  per `systemd-anylyze exit-status`
 
 
 
@@ -254,6 +254,7 @@ def signal_handler(sig_num, frame):
     "SIGILL / Illegal"    if sig_num ==  4        else  \
     "SIGTRAP / Trap"      if sig_num ==  5        else  \
     "SIGABRT / Abort"     if sig_num ==  6        else  \
+    "SIGUSR1 / User1"     if sig_num == 10        else  \
     "SIGTERM / Terminate" if sig_num == 15        else  \
     "SIGPWR / Power"      if sig_num == 30        else  \
     "Unknown signal"
@@ -261,7 +262,9 @@ def signal_handler(sig_num, frame):
   logging.warning( f"Caught signal {sig_name} ({sig_num})")
 
   cleanup_socket()
-  os._exit(sig_num)
+  ## Exit success code unless SIGUSR1, which systemd unit file will
+  ## see as success (SuccessExitStatus=10) and restart:
+  os._exit(signal.SIGUSR1 if sig_num == signal.SIGUSR1 else 0)
 
 
 
@@ -294,6 +297,8 @@ def main():
 	signal.signal(signal.SIGTRAP, signal_handler)
 	## Abort:
 	signal.signal(signal.SIGABRT, signal_handler)
+	## User 1: We'll define as "restart":
+	signal.signal(signal.SIGUSR1, signal_handler)
 	## Terminate
 	signal.signal(signal.SIGTERM, signal_handler)
 	##
